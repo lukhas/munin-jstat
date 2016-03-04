@@ -3,8 +3,6 @@
 PID=$(cat $LICHESS_PID_FILE)
 P_NAME="lichess JVM"
 JSTAT=$JAVA_HOME/bin/jstat
-echo $PID
-echo $JSTAT
 
 function graphically() {
 
