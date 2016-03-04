@@ -1,48 +1,23 @@
 #!/bin/sh
 
-if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/java/latest
-fi
-
-JPS=$JAVA_HOME/bin/jps
+PID=$(cat $LICHESS_PID_FILE)
+P_NAME="lichess JVM"
 JSTAT=$JAVA_HOME/bin/jstat
-
-EXCLUDE_PROCESS=sun.tools.jps.Jps
-
-_IFS=$IFS
-IFS='
-'
-
-JPS_PROCESSES=(`$JPS -l`)
-
-IFS=$_IFS
-
 
 function graphically() {
 
-    JPS_RESULTS=($@)
-    if test ${JPS_RESULTS[1]} != ${EXCLUDE_PROCESS}; then
 #       echo ${JPS_RESULTS[@]}
-       PID=${JPS_RESULTS[0]}
-       P_NAME=${JPS_RESULTS[1]}
        JSTAT_RESULTS=(`$JSTAT -gcutil $PID`)
 #       echo ${JSTAT_RESULTS[@]} # sample -> S0 S1 E O P YGC YGCT FGC FGCT GCT 29.05 0.00 48.66 56.90 99.22 82 1.498 2 0.178 1.676
 
-       echo "ygct.value ${JSTAT_RESULTS[16]/./}"
-       echo "fgct.value ${JSTAT_RESULTS[18]/./}"
-       echo "agct.value ${JSTAT_RESULTS[19]/./}"
-    fi
+       echo "ygct.value ${JSTAT_RESULTS[18]/./}"
+       echo "fgct.value ${JSTAT_RESULTS[20]/./}"
+       echo "agct.value ${JSTAT_RESULTS[21]/./}"
 
 }
 
 function conf() {
 
-    JPS_RESULTS=($@)
-    if test ${JPS_RESULTS[1]} != ${EXCLUDE_PROCESS}; then
-#       echo ${JPS_RESULTS[@]}
-       PID=${JPS_RESULTS[0]}
-       P_NAME=${JPS_RESULTS[1]}
-       JSTAT_RESULTS=(`$JSTAT -gcutil $PID`)
        echo "graph_title jstat gc time(${P_NAME})"
        echo "graph_args --lower-limit 0"
        echo "graph_scale yes"
@@ -52,16 +27,15 @@ function conf() {
        echo "fgct.label full GC time"
        echo "agct.label all GC time"
        echo "ygct.type DERIVE"
+       echo "ygct.min 0"
        echo "fgct.type DERIVE"
+       echo "fgct.min 0"
        echo "agct.type DERIVE"
-    fi
+       echo "agct.min 0"
 }
 
 if [ "$1" = "config" ]; then
-    for item in "${JPS_PROCESSES[@]}"
-    do
-        conf ${item[@]}
-    done
+        conf
     exit 0
 fi
 
@@ -70,9 +44,6 @@ if [ "$1" = "autoconf" ]; then
         exit 0
 fi
 
-for item in "${JPS_PROCESSES[@]}"
-do
-    graphically ${item[@]}
-done
+graphically
 
 

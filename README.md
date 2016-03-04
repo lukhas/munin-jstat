@@ -1,8 +1,8 @@
-this is munin-plugin for Java GC stats.
+this is munin-plugin for Java GC stats, modified to run on lichess instances.
 
 plugin call jps and jstat. - http://docs.oracle.com/javase/7/docs/technotes/tools/share/jstat.html
 
-tested on JDK1.7 and CentOS 6.1
+tested on JDK1.8 and recent (2014+) Ubuntus.
 
 
 # 1.Install
